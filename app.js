@@ -31,11 +31,15 @@ app.get("/buss/:from/:to", function (req, res) {
 app.get("/addBook", (req, res) => {
   let printForm = `<h1>Lägg till bok</h1>
      <form action="saveBook" method="post">Vill du lägga till en bok?<br><br>
-      <input type="text" name="title" placeholder="Titel"/><br>
-      <input type="text" name="author" placeholder="Författare"/><br>
-      <input type="number" name="pages"placeholder="Antal sidor"/><br><br>
+      <input type="text" required="required" name="title" placeholder="Titel"/><br>
+      <input type="text" required="required" name="author" placeholder="Författare"/><br>
+      <input type="number" required="required" name="pages"placeholder="Antal sidor"/><br><br>
       <button>Lägg till bok</button>
-     </form>`;
+      <br />
+      <br />
+      </form>
+      <a href="/"><button>tillbaka till start</button></a>
+      `;
 
   res.send(printForm);
 });
@@ -43,18 +47,42 @@ app.get("/addBook", (req, res) => {
 let books = [];
 
 app.post("/saveBook", (req, res) => {
-  let exampleBooks = [{ title: "Bok1", author: "Författare1", pages: "123" }];
-  let addedBook = [
-    { title: req.body.title, author: req.body.author, pages: req.body.pages },
-  ];
+  let addedBook = {
+    title: req.body.title,
+    author: req.body.author,
+    pages: req.body.pages,
+  };
 
   if (books.length == 0) {
-    books.push(exampleBooks);
     books.push(addedBook);
   } else {
     books.push(addedBook);
   }
-  res.json(books);
+
+  let linkToBooks = `<h1>Boken med titel: ${
+    req.body.title +
+    ", skriven av: " +
+    req.body.author +
+    ", med sidor: " +
+    req.body.pages +
+    " lades till i biblioteket"
+  }<h1><br /><a href="/books"><button>Visa alla böcker</button></a>`;
+
+  res.send(linkToBooks);
+});
+
+app.get("/books", (req, res) => {
+  let bookList = books.map((book) => {
+    return `<li><h4>Titel: ${book.title}. Författare: ${book.author}. Sidor: ${book.pages} </h4> </li>`;
+  });
+
+  let text = "<h1>Alla böcker</h1>";
+
+  let allBooks = `<ul>${bookList}</ul>`;
+
+  let backToStart = '<a href="/"><button>Tillbaka till startsidan</button></a>';
+
+  res.send(text + allBooks + backToStart);
 });
 
 module.exports = app;
